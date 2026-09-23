@@ -1,5 +1,5 @@
-import { useState, type FormEvent } from 'react'
-import { Pencil, Plus, Trash2, X } from 'lucide-react'
+import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { ImagePlus, Pencil, Plus, Trash2, X } from 'lucide-react'
 import type { DirectorMessage } from '../types'
 import { directorMessages as initialDirectorMessages } from '../data'
 
@@ -7,9 +7,10 @@ type FormState = {
   name: string
   designation: string
   message: string
+  profilePicture: string
 }
 
-const EMPTY_FORM: FormState = { name: '', designation: '', message: '' }
+const EMPTY_FORM: FormState = { name: '', designation: '', message: '', profilePicture: '' }
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -34,12 +35,26 @@ export default function DirectorMessagePage() {
 
   function openEditModal(msg: DirectorMessage) {
     setEditingId(msg.id)
-    setForm({ name: msg.name, designation: msg.designation, message: msg.message })
+    setForm({
+      name: msg.name,
+      designation: msg.designation,
+      message: msg.message,
+      profilePicture: msg.profilePicture ?? '',
+    })
     setModalOpen(true)
   }
 
   function closeModal() {
     setModalOpen(false)
+  }
+
+  function handleProfilePictureChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => setForm((current) => ({ ...current, profilePicture: reader.result as string }))
+    reader.readAsDataURL(file)
   }
 
   function handleSubmit(e: FormEvent) {
@@ -110,9 +125,17 @@ export default function DirectorMessagePage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-[14px] font-bold text-white">
-                      {initial}
-                    </div>
+                    {msg.profilePicture ? (
+                      <img
+                        src={msg.profilePicture}
+                        alt={`${msg.name} profile`}
+                        className="h-10 w-10 shrink-0 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-[14px] font-bold text-white">
+                        {initial}
+                      </div>
+                    )}
                     <div className="min-w-0">
                       <p className="truncate text-[14px] font-bold text-surface-heading">
                         {msg.name}
@@ -173,6 +196,38 @@ export default function DirectorMessagePage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 px-5 py-4">
+              <div className="block">
+                <span className="mb-1.5 block text-[13px] font-semibold text-surface-heading">
+                  Profile Picture
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePictureChange}
+                  className="hidden"
+                  id="director-profile-picture"
+                />
+                <label
+                  htmlFor="director-profile-picture"
+                  className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-surface-border bg-slate-50/70 px-3 py-3 hover:bg-slate-50"
+                >
+                  {form.profilePicture ? (
+                    <img
+                      src={form.profilePicture}
+                      alt="Profile preview"
+                      className="h-14 w-14 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-brand-500">
+                      <ImagePlus size={21} />
+                    </div>
+                  )}
+                  <span className="text-[12.5px] text-surface-muted">
+                    {form.profilePicture ? 'Choose a different picture' : 'Choose a picture'}
+                  </span>
+                </label>
+              </div>
+
               <label className="block">
                 <span className="mb-1.5 block text-[13px] font-semibold text-surface-heading">
                   Name

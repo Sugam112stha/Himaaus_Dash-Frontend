@@ -44,6 +44,7 @@ export interface DirectorMessage {
   name: string
   designation: string
   message: string
+  profilePicture?: string
   updatedAt: string
 }
 
