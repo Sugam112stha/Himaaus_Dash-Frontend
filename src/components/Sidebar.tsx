@@ -35,7 +35,7 @@ export default function Sidebar({ open, onClose, onNavigate, collapsed }: Sideba
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex flex-col border-r border-surface-border bg-white transition-all duration-200 ease-out lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex flex-col border-r border-surface-border bg-white transition-all duration-200 ease-out lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         } ${collapsed ? 'lg:w-[76px]' : 'lg:w-64'} w-64`}
       >
