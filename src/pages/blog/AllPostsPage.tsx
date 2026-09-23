@@ -1,20 +1,32 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
-import { getPosts, deletePost } from '../../lib/blogStore'
+import type { BlogPost } from '../../types'
+import { getBlogPosts } from '../../services/api'
 
 function formatDate(iso: string) {
   return iso
 }
 
 export default function AllPostsPage() {
-  const [posts, setPosts] = useState(() => getPosts())
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [perPage, setPerPage] = useState(25)
 
+  useEffect(() => {
+    getBlogPosts()
+      .then(setPosts)
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : 'Unable to load blog posts.')
+      })
+      .finally(() => setIsLoading(false))
+  }, [])
+
   function confirmDelete() {
     if (deleteId) {
-      setPosts(deletePost(deleteId))
+      setPosts((currentPosts) => currentPosts.filter((post) => post.id !== deleteId))
       setDeleteId(null)
     }
   }
@@ -64,7 +76,16 @@ export default function AllPostsPage() {
           </label>
         </div>
 
-        {posts.length === 0 ? (
+        {isLoading ? (
+          <div className="p-10 text-center">
+            <p className="text-[13.5px] font-medium text-surface-heading">Loading posts...</p>
+          </div>
+        ) : error ? (
+          <div className="p-10 text-center">
+            <p className="text-[13.5px] font-medium text-rose-600">Unable to load posts</p>
+            <p className="mt-1 text-[12.5px] text-surface-muted">{error}</p>
+          </div>
+        ) : posts.length === 0 ? (
           <div className="p-10 text-center">
             <p className="text-[13.5px] font-medium text-surface-heading">No posts yet</p>
             <p className="mt-1 text-[12.5px] text-surface-muted">

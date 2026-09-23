@@ -1,13 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import PostForm from './PostForm'
-import { addPost, type PostInput } from '../../lib/blogStore'
+import { createBlogPost } from '../../services/api'
+import type { PostInput } from '../../lib/blogStore'
 
 export default function NewPostPage() {
   const navigate = useNavigate()
 
-  function handleSubmit(input: PostInput) {
-    addPost(input)
+  async function handleSubmit(input: PostInput) {
+    await createBlogPost(input)
     navigate('/blog-posts/all-posts')
   }
 

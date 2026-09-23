@@ -9,7 +9,7 @@ const CATEGORIES = ['Educational', 'general', 'Visa', 'Scholarship', 'Events']
 interface PostFormProps {
   initial?: BlogPost
   submitLabel: string
-  onSubmit: (input: PostInput) => void
+  onSubmit: (input: PostInput) => void | Promise<void>
   onCancel: () => void
 }
 
@@ -32,22 +32,27 @@ export default function PostForm({ initial, submitLabel, onSubmit, onCancel }: P
     reader.readAsDataURL(file)
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!title.trim()) {
       setError('Please enter a blog post title.')
       return
     }
-    onSubmit({
-      title: title.trim(),
-      link: link.trim(),
-      author: author.trim(),
-      excerpt: excerpt.trim(),
-      longDescription,
-      category,
-      image,
-      status,
-    })
+    try {
+      setError('')
+      await onSubmit({
+        title: title.trim(),
+        link: link.trim(),
+        author: author.trim(),
+        excerpt: excerpt.trim(),
+        longDescription,
+        category,
+        image,
+        status,
+      })
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unable to create the blog post.')
+    }
   }
 
   return (
