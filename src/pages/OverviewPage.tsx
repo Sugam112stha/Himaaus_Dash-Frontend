@@ -2,14 +2,24 @@
 // live directly inside App.tsx. Pulling it into its own file makes it a
 // normal page that the router can send people to at "/".
 
+import { useEffect, useState } from 'react'
 import StatCard from '../components/StatCard'
 import ApplicationsChart from '../components/charts/ApplicationsChart'
 import CountryDistribution from '../components/charts/CountryDistribution'
 import StatisticsChart from '../components/charts/StatisticsChart'
 import { getDashboardStats } from '../lib/dashboardStats'
+import { getBlogPosts } from '../services/api'
 
 export default function OverviewPage() {
-  const statCards = getDashboardStats()
+  const [blogCount, setBlogCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    getBlogPosts()
+      .then((posts) => setBlogCount(posts.length))
+      .catch(() => setBlogCount(null))
+  }, [])
+
+  const statCards = getDashboardStats(blogCount ?? '—')
 
   return (
     <div className="mx-auto w-full max-w-[1600px] space-y-4 sm:space-y-5">

@@ -29,3 +29,10 @@ export async function createBlogPost(input: PostInput): Promise<BlogPost> {
 
   return response.data
 }
+
+export async function deleteBlogPost(id: string): Promise<void> {
+  const token = localStorage.getItem(AUTH_STORAGE_KEY)
+  await api.delete(`/blogs/${id}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  })
+}

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import type { BlogPost } from '../../types'
-import { getBlogPosts } from '../../services/api'
+import { deleteBlogPost, getBlogPosts } from '../../services/api'
 
 function formatDate(iso: string) {
   return iso
@@ -24,10 +24,15 @@ export default function AllPostsPage() {
       .finally(() => setIsLoading(false))
   }, [])
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (deleteId) {
-      setPosts((currentPosts) => currentPosts.filter((post) => post.id !== deleteId))
-      setDeleteId(null)
+      try {
+        await deleteBlogPost(deleteId)
+        setPosts((currentPosts) => currentPosts.filter((post) => post.id !== deleteId))
+        setDeleteId(null)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Unable to delete the blog post.')
+      }
     }
   }
 

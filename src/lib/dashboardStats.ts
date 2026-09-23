@@ -15,12 +15,11 @@
 import { GraduationCap, MessageCircle, CalendarDays, FileText, Headphones } from 'lucide-react'
 import type { StatCardData } from '../types'
 import { eligibilitySubmissions } from '../data'
-import { getPosts } from './blogStore'
 import { getEpisodes } from './podcastStore'
 import { initialApplicants } from '../components/Appointments/data'
 import { initialContacts } from '../components/Contact-us/data'
 
-export function getDashboardStats(): StatCardData[] {
+export function getDashboardStats(blogCount: number | string = 0): StatCardData[] {
   return [
     {
       label: 'Total Eligibility Students',
@@ -45,7 +44,7 @@ export function getDashboardStats(): StatCardData[] {
     },
     {
       label: 'Total Blogs',
-      value: getPosts().length,
+      value: blogCount,
       icon: FileText,
       iconBg: 'bg-indigo-50',
       iconColor: 'text-indigo-500',
